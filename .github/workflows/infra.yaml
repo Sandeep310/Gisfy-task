@@ -1,7 +1,9 @@
 name: Terraform Creation of AWS Infrastructure
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   terraform:
