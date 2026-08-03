@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 
 const app = express();
+
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -16,87 +17,132 @@ const pool = new Pool({
 });
 
 /* =========================
-   DB Connection Test
+   Database Connection Test
 ========================= */
 
 pool.connect()
-.then(()=>console.log("Database connected"))
-.catch(err=>console.error("Database connection failed",err));
+  .then(() => console.log("✅ Database connected"))
+  .catch(err => console.error("❌ Database connection failed:", err));
 
 /* =========================
    Auto Table Creation
 ========================= */
 
-async function initDB(){
-
-  try{
-
+async function initDB() {
+  try {
     await pool.query(`
-
-      CREATE TABLE IF NOT EXISTS users(
-
+      CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
-
         name VARCHAR(100) NOT NULL,
-
         email VARCHAR(150) UNIQUE NOT NULL,
-
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-
       );
-
-      CREATE INDEX IF NOT EXISTS idx_users_email
-      ON users(email);
-
     `);
 
-    console.log("Users table ready");
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_users_email
+      ON users(email);
+    `);
 
+    console.log("✅ Users table ready");
+  } catch (err) {
+    console.error("❌ Database initialization failed:", err);
+    console.log("Retrying in 5 seconds...");
+    setTimeout(initDB, 5000);
   }
-  catch(err){
-
-    console.log("Waiting for database... retrying");
-
-    setTimeout(initDB,5000);
-
-  }
-
 }
 
 initDB();
 
-/* Routes */
-app.get("/health", (req, res) => res.status(200).send("OK"));
+/* =========================
+   Routes
+========================= */
+
+app.get("/", (req, res) => {
+  res.send("Backend API is Running 🚀");
+});
+
+app.get("/health", (req, res) => {
+  res.status(200).send("OK");
+});
+
+/* GET Users */
+
 app.get("/api/users", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM users ORDER BY id DESC");
-    res.json(result.rows);
-  } catch {
-    res.status(500).send("Server error");
-  }
-});
-app.post("/api/users", async (req, res) => {
-  const { name, email } = req.body;
-  if (!name || !email) return res.status(400).send("Missing fields");
-  try {
-    await pool.query("INSERT INTO users(name,email) VALUES($1,$2)", [name, email]);
-    res.status(201).send("User added");
-  } catch {
-    res.status(400).send("Email already exists");
-  }
-});
-app.delete("/api/users/:id", async (req, res) => {
-  try {
-    await pool.query("DELETE FROM users WHERE id=$1", [req.params.id]);
-    res.send("User deleted");
-  } catch {
-    res.status(500).send("Delete failed");
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error("GET USERS ERROR:", err);
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
   }
 });
 
-/* Start server */
-app.listen(process.env.PORT || 5000, "0.0.0.0", () =>
-  console.log(`Backend running on port ${process.env.PORT || 5000}`)
-);
+/* ADD User */
+
+app.post("/api/users", async (req, res) => {
+  const { name, email } = req.body;
+
+  if (!name || !email) {
+    return res.status(400).json({
+      success: false,
+      message: "Name and Email are required"
+    });
+  }
+
+  try {
+    await pool.query(
+      "INSERT INTO users(name,email) VALUES($1,$2)",
+      [name, email]
+    );
+
+    res.status(201).json({
+      success: true,
+      message: "User added successfully"
+    });
+  } catch (err) {
+    console.error("ADD USER ERROR:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
+});
+
+/* DELETE User */
+
+app.delete("/api/users/:id", async (req, res) => {
+  try {
+    await pool.query(
+      "DELETE FROM users WHERE id=$1",
+      [req.params.id]
+    );
+
+    res.json({
+      success: true,
+      message: "User deleted successfully"
+    });
+  } catch (err) {
+    console.error("DELETE USER ERROR:", err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+  }
+});
+
+/* =========================
+   Start Server
+========================= */
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Backend running on port ${PORT}`);
+});
