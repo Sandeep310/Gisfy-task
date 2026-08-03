@@ -1,19 +1,19 @@
 name: Docker Image Build and Push
 
 on:
-    push:
-      branches:
-        - main
+  push:
+    branches:
+      - main
+
 jobs:
   build-push-scan:
     runs-on: ubuntu-latest
 
     env:
-        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
     steps:
-
       - name: Checkout source code
         uses: actions/checkout@v4
 
@@ -30,26 +30,26 @@ jobs:
         run: docker push $DOCKER_USERNAME/backend:latest
 
       - name: Push Frontend Image
-        run: docker push $DOCKER_USERNAME/frontend:latest 
+        run: docker push $DOCKER_USERNAME/frontend:latest
 
-      - name: Install Trivy
-        run: |
-            wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.69.3_Linux-64bit.deb
-            sudo dpkg -i trivy_0.69.3_Linux-64bit.deb
+      - name: Scan Backend Image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: "${{ env.DOCKER_USERNAME }}/backend:latest"
+          format: "table"
+          output: "backend-trivy-report.txt"
 
-      - name: Trivy scan Backend
-        run: |
-            echo "===== BACKEND IMAGE =====" > trivy-report.txt
-            trivy image -f table $DOCKER_USERNAME/backend:latest >> trivy-report.txt
-                     
-      - name: Trivy scan Frontend
-        run: |
-            echo "===== FRONTEND IMAGE =====" >> trivy-report.txt
-            trivy image -f table $DOCKER_USERNAME/frontend:latest >> trivy-report.txt
-                  
-      - name: Upload Trivy Report
+      - name: Scan Frontend Image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: "${{ env.DOCKER_USERNAME }}/frontend:latest"
+          format: "table"
+          output: "frontend-trivy-report.txt"
+
+      - name: Upload Trivy Reports
         uses: actions/upload-artifact@v4
         with:
-          name: trivy-report
-          path: trivy-report.txt
-
+          name: trivy-reports
+          path: |
+            backend-trivy-report.txt
+            frontend-trivy-report.txt
