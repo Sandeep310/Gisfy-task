@@ -15,8 +15,10 @@ resource "aws_eks_cluster" "base" {
   }
 
   depends_on = [
-    aws_iam_role_policy_attachment.eks_cluster_policy
-  ]
+  aws_iam_role_policy_attachment.eks_cluster_policy,
+  aws_route_table_association.subnet1,
+  aws_route_table_association.subnet2
+]
 
   tags = {
     Env = terraform.workspace
