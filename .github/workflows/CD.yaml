@@ -1,6 +1,6 @@
 #CD
 
-name: Terraform + Kubernetes Deployment
+name:  Kubernetes Deployment
 
 on:
   workflow_run:
@@ -29,23 +29,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
-      - name: Terraform Init
-        run: terraform init
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-
-      - name: Update kubeconfig
-        run: |
-          aws eks update-kubeconfig \
-          --region ap-south-1 \
-          --name eks-cluster
+      
 
       - name: Deploy Kubernetes Resources
         working-directory: ./kubernetes
