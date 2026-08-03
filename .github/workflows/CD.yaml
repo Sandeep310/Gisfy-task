@@ -1,0 +1,59 @@
+#CD
+
+name: Terraform + Kubernetes Deployment
+
+on:
+  workflow_run:
+    workflows: ["Docker Image Build and Push"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./Infra
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+          --region ap-south-1 \
+          --name eks-cluster
+
+      - name: Deploy Kubernetes Resources
+        working-directory: ./kubernetes
+        run: |
+          kubectl apply -f .
+
+      - name: Verify Deployment
+        run: |
+          kubectl get nodes
+          kubectl get pods -A
+          kubectl get svc -A

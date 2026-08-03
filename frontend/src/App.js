@@ -3,21 +3,17 @@ import axios from "axios";
 import "./App.css";
 
 /* API configuration */
-const API = process.env.REACT_APP_API || "http://localhost:5000";
+const API = "";
 
 function App() {
-
   const [users, setUsers] = useState([]);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
 
-  /* =========================
-     Fetch Users
-  ========================== */
   const fetchUsers = async () => {
     try {
-      const res = await axios.get(`api/users`);
+      const res = await axios.get(`${API}/api/users`);
       setUsers(res.data);
     } catch (err) {
       setMessage("Backend connection failed");
@@ -25,9 +21,6 @@ function App() {
     }
   };
 
-  /* =========================
-     Add User
-  ========================== */
   const addUser = async () => {
     if (!name || !email) {
       setMessage("Please enter all fields");
@@ -35,7 +28,11 @@ function App() {
     }
 
     try {
-      await axios.post(`api/users`, { name, email });
+      await axios.post(`${API}/api/users`, {
+        name,
+        email,
+      });
+
       setMessage("User added successfully");
       setName("");
       setEmail("");
@@ -48,18 +45,16 @@ function App() {
     setTimeout(() => setMessage(""), 2000);
   };
 
-  /* =========================
-     Delete User
-  ========================== */
   const deleteUser = async (id) => {
-  try {
-    await axios.delete(`/api/users/${id}`); // relative URL
-    setMessage("User deleted");
-    fetchUsers();
-  } catch {
-    setMessage("Delete failed");
-  }
-};
+    try {
+      await axios.delete(`${API}/api/users/${id}`);
+      setMessage("User deleted");
+      fetchUsers();
+    } catch (err) {
+      setMessage("Delete failed");
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
@@ -77,13 +72,15 @@ function App() {
           <input
             value={name}
             placeholder="Enter name"
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
           />
+
           <input
             value={email}
             placeholder="Enter email"
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
           />
+
           <button className="addBtn" onClick={addUser}>
             Add User
           </button>
@@ -91,19 +88,26 @@ function App() {
 
         <div className="users">
           <h3>Users</h3>
-          {users.length === 0 && <p className="empty">No users added</p>}
 
-          {users.map(u => (
-            <div className="userCard" key={u.id}>
-              <div>
-                <div className="userName">{u.name}</div>
-                <div className="userEmail">{u.email}</div>
+          {users.length === 0 ? (
+            <p className="empty">No users added</p>
+          ) : (
+            users.map((u) => (
+              <div className="userCard" key={u.id}>
+                <div>
+                  <div className="userName">{u.name}</div>
+                  <div className="userEmail">{u.email}</div>
+                </div>
+
+                <button
+                  className="deleteBtn"
+                  onClick={() => deleteUser(u.id)}
+                >
+                  Delete
+                </button>
               </div>
-              <button className="deleteBtn" onClick={() => deleteUser(u.id)}>
-                Delete
-              </button>
-            </div>
-          ))}
+            ))
+          )}
         </div>
       </div>
     </div>

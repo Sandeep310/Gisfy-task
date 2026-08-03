@@ -67,3 +67,4 @@ jobs:
         with:
           name: trivy-report
           path: trivy-report.txt
+
