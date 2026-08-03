@@ -1,14 +1,11 @@
-output "resource_group_name" {
-  description = "AKS Resource Group Name"
-  value       = azurerm_resource_group.base.name
+output "cluster_name" {
+  value = aws_eks_cluster.base.name
 }
 
-output "aks_cluster_name" {
-  description = "AKS Cluster Name"
-  value       = azurerm_kubernetes_cluster.base.name
+output "cluster_endpoint" {
+  value = aws_eks_cluster.base.endpoint
 }
 
-output "aks_cluster_location" {
-  description = "AKS Location"
-  value       = azurerm_kubernetes_cluster.base.location
+output "cluster_ca_certificate" {
+  value = aws_eks_cluster.base.certificate_authority[0].data
 }

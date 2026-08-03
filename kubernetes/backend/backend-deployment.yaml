@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: venkeyboda/backend:latest
+          image: sndeep310/backend:latest
           ports:
             - containerPort: 5000
           env:

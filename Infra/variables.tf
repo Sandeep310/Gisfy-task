@@ -1,26 +1,17 @@
-variable "resource_group_name" {
-  type = string
-
-}
-
 variable "region" {
   type = string
-
 }
 
-variable "aks_cluster_info" {
+variable "private_subnet_ids" {
+  description = "Private subnet IDs for EKS"
+  type        = list(string)
+}
+
+variable "eks_cluster_info" {
   type = object({
-    name       = string
-    dns_prefix = string
-    node_count = optional(number, 1)
-    vm_size    = optional(string, "Standard_B2ms")
-
+    name          = string
+    version       = string
+    node_count    = number
+    instance_type = string
   })
-
 }
-
-# variable "build_id" {
-#   type    = string
-#   default = "1"
-
-# }

@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: venkeyboda/frontend:latest
+          image: sndeep310/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
