@@ -1,0 +1,198 @@
+name: Docker Image Build and Push
+
+on:
+    push:
+      branches:
+        - main
+jobs:
+  changes:
+
+    runs-on: ubuntu-latest
+    outputs:
+      run_app: ${{ steps.filter.outputs.app }}
+      run_infra: ${{ steps.filter.outputs.infra }}
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+  
+      - name: Filter changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            app:
+              - 'backend/**'
+              - 'frontend/**'
+              - 'database/**'
+              - 'k8s/**'
+            infra:
+              - 'Infra/**'
+
+  build-push-scan:
+    needs: changes
+    if: needs.changes.outputs.run_app == 'true'
+    runs-on: ubuntu-latest
+
+    env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+
+    steps:
+
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+      - name: Build Backend Image
+        run: docker build -t $DOCKER_USERNAME/backend:latest ./backend
+
+      - name: Build Frontend Image
+        run: docker build -t $DOCKER_USERNAME/frontend:latest ./frontend
+
+      - name: Push Backend Image
+        run: docker push $DOCKER_USERNAME/backend:latest
+
+      - name: Push Frontend Image
+        run: docker push $DOCKER_USERNAME/frontend:latest 
+
+      - name: Install Trivy
+        run: |
+            wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.69.3_Linux-64bit.deb
+            sudo dpkg -i trivy_0.69.3_Linux-64bit.deb
+
+      - name: Trivy scan Backend
+        run: |
+            echo "===== BACKEND IMAGE =====" > trivy-report.txt
+            trivy image -f table $DOCKER_USERNAME/backend:latest >> trivy-report.txt
+                     
+      - name: Trivy scan Frontend
+        run: |
+            echo "===== FRONTEND IMAGE =====" >> trivy-report.txt
+            trivy image -f table $DOCKER_USERNAME/frontend:latest >> trivy-report.txt
+                  
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.txt
+
+# =========================
+# CD JOB
+# =========================
+
+  aks-infrastructure-provisioning:
+      runs-on: ubuntu-latest    
+      needs: [changes]
+      if: needs.changes.outputs.run_infra == 'true'
+      steps:
+
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Azure Login
+          uses: azure/login@v2
+          with:
+            creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+        - name: Setup Terraform
+          uses: hashicorp/setup-terraform@v3
+
+        - name: Terraform Init
+          working-directory: Infra
+          run: terraform init
+
+        - name: Terraform Plan
+          working-directory: Infra
+          run: |
+            terraform plan \
+                -var-file="terraform.tfvars" \
+                -input=false \
+                -out=tfplan
+
+        - name: Terraform Apply
+          working-directory: Infra
+          run: terraform apply -auto-approve tfplan
+
+  deploy-to-aks:
+    runs-on: ubuntu-latest
+    needs: [changes, build-push-scan, aks-infrastructure-provisioning]
+
+    if: |
+      always() &&
+      (needs.changes.outputs.run_app == 'true' || needs.changes.outputs.run_infra == 'true')
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+ 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+        
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v4  
+
+      - name: Get AKS credentials
+        run: |
+          az aks get-credentials \
+          --resource-group ${{ vars.RG_NAME }} \
+          --name ${{ vars.AKS_NAME }} \
+          --overwrite-existing  
+
+      - name: Wait cluster ready
+        run: |
+            az aks wait \
+            --resource-group ${{ vars.RG_NAME }} \
+            --name ${{ vars.AKS_NAME }} \
+            --created
+
+      - name: Verify cluster
+        run: |
+            kubectl cluster-info
+            kubectl get nodes
+
+      - name: Install ingress if missing
+        run: |
+            if ! kubectl get deployment ingress-nginx-controller -n ingress-nginx; then
+              kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/cloud/deploy.yaml
+            else
+              echo "Ingress controller already exists"
+            fi
+      
+      - name: Deploy Kubernetes resources
+        run: |
+          kubectl apply -f kubernetes/namespace.yaml
+          
+          sleep 20s
+
+          kubectl apply -f kubernetes/postgres-configmap.yaml
+
+          kubectl apply -f kubernetes/database
+
+          kubectl apply -f kubernetes/backend
+          kubectl apply -f kubernetes/frontend
+
+          kubectl apply -f kubernetes/Ingress
+
+# =========================
+# Email alerts
+# =========================
+
+  send-email-alerts:
+    needs: [build-push-scan, aks-infrastructure-provisioning, deploy-to-aks]
+    if: always()
+    uses: ./.github/workflows/email-alert.yml
+
+    with:
+      ci_status: ${{ needs.build-push-scan.result }}
+      infra_status: ${{ needs.aks-infrastructure-provisioning.result }}
+      deploy_status: ${{ needs.deploy-to-aks.result }}
+
+    secrets: inherit
+
+
+            
