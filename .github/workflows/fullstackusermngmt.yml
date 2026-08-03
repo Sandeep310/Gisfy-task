@@ -33,7 +33,7 @@ jobs:
         run: docker push $DOCKER_USERNAME/frontend:latest
 
       - name: Scan Backend Image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           image-ref: "${{ env.DOCKER_USERNAME }}/backend:latest"
           format: "table"
