@@ -1,9 +1,7 @@
 name: Terraform Creation of AWS Infrastructure
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
   terraform:
@@ -12,7 +10,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: infra
+        working-directory: Infra
 
     steps:
       - name: Checkout Repository
