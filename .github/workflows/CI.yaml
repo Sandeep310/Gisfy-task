@@ -37,6 +37,14 @@ jobs:
         run: |
           docker push $DOCKER_USERNAME/frontend:latest
 
+      - name: Build Database Image
+        run: |
+          docker build -t $DOCKER_USERNAME/postgres-db:latest ./database
+
+      - name: Push Database Image
+        run: |
+          docker push $DOCKER_USERNAME/postgres-db:latest    
+
       - name: Install Trivy
         run: |
           sudo apt-get update
