@@ -72,6 +72,20 @@ pipeline {
                 sh 'docker push sndeep310/postgres-db:latest'
             }
         }
+        stage('Commit Updated Manifests') {
+            steps {
+            sh """
+            git config user.name "Jenkins"
+            git config user.email "jenkins@local"
+
+            git add .
+
+            git commit -m "Updated image tag to ${BUILD_NUMBER}" || true
+
+            git push origin HEAD:main
+        """
+    }
+}
 
         stage('Configure kubectl') {
             steps {
