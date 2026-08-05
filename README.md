@@ -86,7 +86,7 @@ The application consists of:
 # 📂 Project Structure
 
 ```
-Gisfy-task
+three-tier-devops-pipeline
 │
 ├── backend
 ├── frontend
