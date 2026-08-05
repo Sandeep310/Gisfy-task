@@ -1,4 +1,4 @@
-# 🚀 Full Stack DevOps CI/CD Pipeline on AWS EKS using Jenkins, Docker, Kubernetes & Argo CD
+# 🚀 Three-Tier DevOps CI/CD Pipeline on AWS EKS using Jenkins, Docker, Kubernetes, Terraform & Argo CD
 
 ![AWS](https://img.shields.io/badge/AWS-EKS-orange?logo=amazonaws)
 ![Jenkins](https://img.shields.io/badge/Jenkins-CI%2FCD-red?logo=jenkins)
