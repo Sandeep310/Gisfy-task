@@ -293,8 +293,8 @@ http://<LoadBalancer-DNS>
 ## Jenkins Pipeline
 
 ```
-<img width="1916" height="967" alt="image" src="https://github.com/user-attachments/assets/3bc11e72-6bd8-4a22-870c-ed55c545b86f" />
-<img width="1894" height="967" alt="image" src="https://github.com/user-attachments/assets/fad6e7bf-56a9-49b2-a356-ecac4790aa40" />
+<img src="https://github.com/user-attachments/assets/3bc11e72-6bd8-4a22-870c-ed55c545b86f">
+<img src="https://github.com/user-attachments/assets/fad6e7bf-56a9-49b2-a356-ecac4790aa40">
 
 ```
 
@@ -303,7 +303,7 @@ http://<LoadBalancer-DNS>
 ## Argo CD Dashboard
 
 ```
-<img width="1885" height="956" alt="image" src="https://github.com/user-attachments/assets/e854794a-e9b4-4450-873d-b34bbe7a9f95" />
+<img src="https://github.com/user-attachments/assets/e854794a-e9b4-4450-873d-b34bbe7a9f95">
 
 ```
 
@@ -312,7 +312,7 @@ http://<LoadBalancer-DNS>
 ## Kubernetes Pods
 
 ```
-<img width="1913" height="493" alt="image" src="https://github.com/user-attachments/assets/2508c4a6-be16-466b-a556-c15f56b5a585" />
+<img src="https://github.com/user-attachments/assets/2508c4a6-be16-466b-a556-c15f56b5a585">
 
 ```
 
@@ -321,7 +321,7 @@ http://<LoadBalancer-DNS>
 ## Docker Hub Images
 
 ```
-<img width="1894" height="638" alt="image" src="https://github.com/user-attachments/assets/a5136e63-77d3-4c53-b5dc-959c5f6af022" />
+<img src="https://github.com/user-attachments/assets/a5136e63-77d3-4c53-b5dc-959c5f6af022">
 
 ```
 
@@ -330,7 +330,7 @@ http://<LoadBalancer-DNS>
 ## Running Application
 
 ```
-<img width="1908" height="971" alt="image" src="https://github.com/user-attachments/assets/fc57ec02-42ca-478e-a308-43b1192f388a" />
+<img src="https://github.com/user-attachments/assets/fc57ec02-42ca-478e-a308-43b1192f388a">
 
 ```
 
