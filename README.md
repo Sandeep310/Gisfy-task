@@ -292,50 +292,51 @@ http://<LoadBalancer-DNS>
 
 ## Jenkins Pipeline
 
-```
-<img width="1600" height="810" alt="image" src="https://github.com/user-attachments/assets/fff9efde-66da-435f-a86c-bad0baa1c56d" />
+
+<img width="100%" alt="Jenkins Pipeline" src="https://github.com/user-attachments/assets/fff9efde-66da-435f-a86c-bad0baa1c56d">
+
+<br><br>
+
+<img width="100%" alt="Jenkins Pipeline 2" src="https://github.com/user-attachments/assets/24d21cd5-dd10-468b-9480-977980fef835">
 
 
-<img width="1600" height="811" alt="jenkins2" src="https://github.com/user-attachments/assets/24d21cd5-dd10-468b-9480-977980fef835" />
 
-
-```
 
 ---
 
 ## Argo CD Dashboard
 
-```
+
 <img src="https://github.com/user-attachments/assets/e854794a-e9b4-4450-873d-b34bbe7a9f95">
 
-```
+
 
 ---
 
 ## Kubernetes Pods
 
-```
+
 <img src="https://github.com/user-attachments/assets/2508c4a6-be16-466b-a556-c15f56b5a585">
 
-```
+
 
 ---
 
 ## Docker Hub Images
 
-```
+
 <img src="https://github.com/user-attachments/assets/a5136e63-77d3-4c53-b5dc-959c5f6af022">
 
-```
+
 
 ---
 
 ## Running Application
 
-```
+
 <img src="https://github.com/user-attachments/assets/fc57ec02-42ca-478e-a308-43b1192f388a">
 
-```
+
 
 ---
 
