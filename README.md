@@ -293,8 +293,9 @@ http://<LoadBalancer-DNS>
 ## Jenkins Pipeline
 
 ```
-<img src="https://github.com/user-attachments/assets/3bc11e72-6bd8-4a22-870c-ed55c545b86f">
-<img src="https://github.com/user-attachments/assets/fad6e7bf-56a9-49b2-a356-ecac4790aa40">
+![Jenkins Pipeline](https://github.com/user-attachments/assets/3bc11e72-6bd8-4a22-870c-ed55c545b86f)
+
+![Jenkins Pipeline 2](https://github.com/user-attachments/assets/fad6e7bf-56a9-49b2-a356-ecac4790aa40)
 
 ```
 
