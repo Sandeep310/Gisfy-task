@@ -358,7 +358,7 @@ http://<LoadBalancer-DNS>
 ### Clone Repository
 
 ```bash
-git clone https://github.com/Sandeep310/Gisfy-task.git
+git clone https://github.com/Sandeep310/three-tier-devops-pipeline.git
 ```
 
 ### Provision Infrastructure
